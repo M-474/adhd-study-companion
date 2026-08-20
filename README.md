@@ -1,12 +1,15 @@
-ADHD Study Companion
+# ADHD Study Companion
+
 > An AI-powered web application that helps university students with ADHD turn study materials into personalized, actionable study plans using AI, RAG, and evidence-based guidance.
 
-Overview
+## 📌 Overview
+
 ADHD Study Companion is a web-based academic support platform designed to help university students with ADHD manage their academic workload more effectively.
 
 The platform combines an interactive assessment, AI-powered personalization, PDF and lecture analysis, task breakdown, progress tracking, and a RAG-powered chatbot to provide personalized academic support.
 
-Problem
+## 🎯 Problem
+
 University students with ADHD may experience difficulties with:
 
 * Starting and completing tasks
@@ -18,7 +21,8 @@ University students with ADHD may experience difficulties with:
 
 Traditional study tools often provide the same experience to every student without considering individual needs and difficulties.
 
-Solution
+## 💡 Solution
+
 ADHD Study Companion uses AI to create a more personalized academic experience.
 
 The platform:
@@ -31,7 +35,7 @@ The platform:
 6. Provides evidence-based academic guidance through a RAG-powered chatbot.
 7. Helps users track their progress and stay organized.
 
-Key Features
+## ✨ Key Features
 
 * 🧩 Interactive assessment
 * 🤖 AI-powered personalization
@@ -44,7 +48,7 @@ Key Features
 * 🔔 Reminders and notifications
 * 📖 Evidence-based academic guidance
 
- 🏗️ System Architecture
+## 🏗️ System Architecture
 
 The application consists of several main components:
 
@@ -77,7 +81,7 @@ Web Application
                 LLM
 ```
 
-  AI & RAG
+## 🧠 AI & RAG
 
 The platform uses Retrieval-Augmented Generation (RAG) to provide responses based on a curated knowledge base.
 
@@ -93,9 +97,9 @@ The RAG pipeline includes:
 
 The system retrieves relevant information from the knowledge base before generating responses, helping keep the chatbot grounded in reliable sources.
 
- Tech Stack
+## 🛠️ Tech Stack
 
-Frontend
+### Frontend
 
 * React
 * JavaScript / TypeScript
@@ -108,25 +112,25 @@ Frontend
 * Flask / FastAPI
 * REST APIs
 
- AI
+### AI
 
 * Large Language Models (LLMs)
 * Retrieval-Augmented Generation (RAG)
 * LangChain
 * Sentence Transformers
 
- Database & Storage
+### Database & Storage
 
 * PostgreSQL
 * ChromaDB
 
- Development
+### Development
 
 * Git
 * GitHub
 * VS Code
 
-Project Structure
+## 📂 Project Structure
 
 ```text
 adhd-study-companion/
@@ -149,9 +153,9 @@ adhd-study-companion/
 
 > The project structure may evolve as development continues.
 
-Getting Started
+## 🚀 Getting Started
 
-Prerequisites
+### Prerequisites
 
 Make sure you have installed:
 
@@ -161,7 +165,7 @@ Make sure you have installed:
 * Git
 * PostgreSQL
 
-Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/adhd-study-companion.git
@@ -169,7 +173,7 @@ git clone https://github.com/YOUR_USERNAME/adhd-study-companion.git
 cd adhd-study-companion
 ```
 
-Backend Setup
+### Backend Setup
 
 ```bash
 python -m venv .venv
@@ -177,7 +181,7 @@ python -m venv .venv
 
 Activate the virtual environment:
 
-Windows:
+**Windows:**
 
 ```bash
 .venv\Scripts\activate
@@ -195,23 +199,23 @@ Create a `.env` file based on `.env.example`.
 
 Do not commit API keys, passwords, or other secrets to GitHub.
 
-Run the Application
+### Run the Application
 
 Start the backend:
 
 ```bash
- Add the actual backend command here
+# Add the actual backend command here
 ```
 
 Start the frontend:
 
 ```bash
- Add the actual frontend command here
+# Add the actual frontend command here
 ```
 
 Then open the web application in your browser.
 
- Screenshots
+## 📸 Screenshots
 
 Add screenshots or GIFs of the web application here.
 
@@ -226,7 +230,7 @@ docs/
     └── chatbot.png
 ```
 
-Privacy & Security
+## 🔐 Privacy & Security
 
 The application is designed with user privacy and security in mind.
 
@@ -235,7 +239,7 @@ The application is designed with user privacy and security in mind.
 * Authentication and authorization are handled through the backend.
 * User data should only be accessed according to the application's authorization rules.
 
-Disclaimer
+## ⚠️ Disclaimer
 
 ADHD Study Companion is an educational and academic support platform.
 
@@ -243,7 +247,7 @@ It does **not** provide medical diagnosis, medical treatment, or professional cl
 
 The platform's recommendations are intended to provide educational and study-support strategies based on available evidence and should not replace consultation with qualified healthcare professionals.
 
-Roadmap
+## 🗺️ Roadmap
 
 * [x] Interactive assessment
 * [x] AI personalization
@@ -257,8 +261,7 @@ Roadmap
 * [ ] University integrations
 * [ ] More academic resources
 
-
-Contributing
+## 🤝 Contributing
 
 Contributions, suggestions, and feedback are welcome.
 
@@ -270,6 +273,6 @@ If you would like to contribute:
 4. Commit your changes.
 5. Open a Pull Request.
 
-License
+## 📄 License
 
 This project is licensed under the MIT License.
