@@ -256,7 +256,7 @@ Roadmap
 * [ ] Advanced personalization
 * [ ] University integrations
 * [ ] More academic resources
-* [ ] Mobile application as a future expansion
+
 
 Contributing
 
