@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="serene-light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus & ADHD Hub | منصتك الشخصية لتنظيم المهام والتركيز</title>
+    <meta name="description" content="منصة متكاملة لتفكيك المهام لـ Milestones، تقييم ADHD، وإدارة الـ To-Do List مع مستشار الذكاء الاصطناعي">
+    
+    <!-- Google Fonts: Readex Pro (Arabic) & Plus Jakarta Sans (English) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Premium Stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css?v=6">
+</head>
+<body>
+
+    <!-- Onboarding Modal (Name, Age, Avatar -> Auto enters Assessment) -->
+    <div id="onboardingModal" class="onboarding-overlay hidden">
+        <div class="onboarding-card">
+            <div class="onboarding-icon">
+                <span class="brand-glow"></span>
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <h2 data-i18n="onboarding_title">مرحباً بك في منصة Focus</h2>
+            <p data-i18n="onboarding_subtitle">عرفنا بنفسك لنبدأ تقييم ADHD المخصص لك ونخصص لك تجربة تركيز تناسب عقلك.</p>
+
+            <form id="onboardingForm" class="onboarding-form">
+                <!-- Avatar Selection / Upload -->
+                <div class="avatar-select-section">
+                    <label data-i18n="choose_avatar">اختر صورتك الرمزية أو ارفع صورة:</label>
+                    <div class="avatar-presets">
+                        <button type="button" class="avatar-btn active" data-avatar="🧑‍💻">🧑‍💻</button>
+                        <button type="button" class="avatar-btn" data-avatar="👩‍🎓">👩‍🎓</button>
+                        <button type="button" class="avatar-btn" data-avatar="🚀">🚀</button>
+                        <button type="button" class="avatar-btn" data-avatar="🌿">🌿</button>
+                        <button type="button" class="avatar-btn" data-avatar="⚡">⚡</button>
+                    </div>
+                    <input type="hidden" id="selectedAvatarInput" value="🧑‍💻">
+                </div>
+
+                <!-- Name Input -->
+                <div class="form-group">
+                    <label for="userNameInput" data-i18n="your_name">الاسم / اللقب:</label>
+                    <input type="text" id="userNameInput" placeholder="اكتب اسمك هنا..." required autocomplete="name">
+                </div>
+
+                <!-- Age Input -->
+                <div class="form-group">
+                    <label for="userAgeInput" data-i18n="your_age">العمر (الأعمار 15-25):</label>
+                    <input type="number" id="userAgeInput" min="10" max="99" placeholder="مثال: 20" required>
+                </div>
+
+                <button type="submit" class="btn-primary-lg">
+                    <i class="fa-solid fa-arrow-left"></i> <span data-i18n="start_assessment_flow">حفظ والبدء في اختبار ADHD تلقائياً</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Minimalist Navbar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <!-- Brand & User Profile Pill -->
+            <div class="nav-brand-group">
+                <div class="nav-brand" id="navBrandBtn">
+                    <span class="brand-glow"></span>
+                    <span class="brand-name">Focus</span>
+                </div>
+                <!-- User Profile Badge in Navbar -->
+                <div class="nav-user-pill" id="navUserProfileBtn" title="ملفك الشخصي">
+                    <span id="navUserAvatar" class="user-nav-avatar">🧑‍💻</span>
+                    <span id="navUserName" class="user-nav-name">مستخدم</span>
+                </div>
+            </div>
+
+            <!-- View Navigation Switcher (Home, Milestones, To-Do List) -->
+            <nav class="nav-views">
+                <button class="view-nav-btn active" data-view="welcome" data-i18n="nav_welcome">
+                    <i class="fa-solid fa-house"></i> <span>الرئيسية</span>
+                </button>
+                <button class="view-nav-btn" data-view="milestones" data-i18n="nav_milestones">
+                    <i class="fa-solid fa-layer-group"></i> <span>تفكيك المهام</span>
+                </button>
+                <button class="view-nav-btn" data-view="todolist" data-i18n="nav_todolist">
+                    <i class="fa-solid fa-list-check"></i> <span>قائمة To-Do</span>
+                </button>
+            </nav>
+
+            <!-- Compact Mini Timer in Navbar -->
+            <div class="nav-timer-widget" id="miniTimerWidget" title="مؤقت التركيز لـ ADHD">
+                <div class="mini-timer-time">
+                    <span id="timerMinutes">15</span>:<span id="timerSeconds">00</span>
+                </div>
+                <div class="mini-timer-actions">
+                    <button id="timerPlayBtn" class="mini-timer-btn" title="تشغيل / إيقاف">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button id="timerResetBtn" class="mini-timer-btn" title="إعادة ضبط">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+                <div class="mini-timer-modes">
+                    <button class="timer-mode-pill active" data-time="15" title="سباق تركيز مصغر (15د) لكسر شلل البدء">15د</button>
+                    <button class="timer-mode-pill" data-time="25" title="جلسة بومودورو الكلاسيكية (25د)">25د</button>
+                    <button class="timer-mode-pill" data-time="5" title="استراحة تجديد الطاقة (5د)">5د</button>
+                </div>
+            </div>
+
+            <!-- Stats & Controls -->
+            <div class="nav-actions">
+                <div class="stat-pill streak-pill" title="أيام الالتزام المتتالية">
+                    <span class="pill-emoji">🔥</span>
+                    <span id="streakCount" class="stat-number">1</span>
+                    <span class="stat-label" data-i18n="streak_unit">يوم</span>
+                </div>
+
+                <div class="stat-pill score-pill" title="نقاط الإنجاز">
+                    <span class="pill-emoji">✨</span>
+                    <span id="scoreCount" class="stat-number">50</span>
+                    <span class="stat-label" data-i18n="score_unit">نقطة</span>
+                </div>
+
+                <!-- Language Toggle -->
+                <button id="langToggleBtn" class="nav-action-btn lang-btn" aria-label="تبديل اللغة" title="تبديل اللغة">
+                    <i class="fa-solid fa-globe"></i>
+                    <span id="langLabel">English</span>
+                </button>
+
+                <!-- Theme Toggle -->
+                <button id="themeToggleBtn" class="nav-action-btn icon-only" aria-label="تبديل النمط" title="تبديل النمط">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+
+                <!-- Logout Button -->
+                <button id="logoutBtn" class="nav-action-btn logout-btn" aria-label="تسجيل الخروج" title="تسجيل الخروج">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span class="logout-label" data-i18n="logout_btn">خروج</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container Switching Views -->
+    <main class="app-main">
+
+        <!-- ===================================================================
+             VIEW 1: Home Page (الرئيسية مع المستوى والتحفيز وتذكير المهمة القادمة)
+             =================================================================== -->
+        <section id="viewWelcome" class="view-pane active">
+            <div class="home-container">
+                
+                <!-- User Profile & Level Card -->
+                <div class="home-profile-card">
+                    <div class="profile-left">
+                        <div class="profile-avatar-box" id="homeUserAvatar">🧑‍💻</div>
+                        <div class="profile-details">
+                            <div class="user-greeting">
+                                <span data-i18n="welcome_back">أهلاً بك،</span> 
+                                <strong id="homeUserName">مستخدم</strong> 
+                                <span class="user-age-pill" id="homeUserAge">20 سنة</span>
+                            </div>
+                            <div class="user-level-row">
+                                <span class="level-badge" id="userLevelBadge">المستوى 1: مبتدئ التركيز</span>
+                                <span class="level-xp-text" id="userXpText">50 / 100 XP</span>
+                            </div>
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" id="userLevelProgressFill" style="width: 50%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-adhd-status" id="profileAdhdStatusBox">
+                        <span class="adhd-status-label" data-i18n="adhd_test_status_label">نمط ADHD المقيم:</span>
+                        <div class="adhd-status-value" id="homeAdhdTypeBadge">لم يتم الاختبار بعد</div>
+                        <button id="retakeAssessmentFromHomeBtn" class="btn-micro-link" data-i18n="retake_test_link">
+                            <i class="fa-solid fa-gamepad"></i> إعادة اختبار ADHD
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Next Task Reminder Callout (تذكير بالمهمة القادمة في الـ To-Do List) -->
+                <div class="next-task-card" id="nextTaskReminderCard">
+                    <div class="next-task-header">
+                        <div class="next-task-tag">
+                            <i class="fa-solid fa-bullseye"></i> <span data-i18n="next_task_tag">مهمتك القادمة الآن للتركيز</span>
+                        </div>
+                        <span class="next-task-time-pill"><i class="fa-regular fa-clock"></i> 15 دقيقة</span>
+                    </div>
+                    <div class="next-task-body">
+                        <h3 id="nextTaskTitle">لا توجد مهام حالية في قائمة To-Do.</h3>
+                        <p id="nextTaskSubtitle">فكك مشروعاً أو مهمة جديدة لتحويلها إلى خطوات سريعة وممتعة!</p>
+                    </div>
+                    <div class="next-task-actions">
+                        <button id="nextTaskCheckBtn" class="btn-primary-sm hidden">
+                            <i class="fa-solid fa-check"></i> <span data-i18n="mark_done_btn">تم الإنجاز (+10 XP)</span>
+                        </button>
+                        <button id="goToTodoListBtn" class="btn-secondary-sm">
+                            <i class="fa-solid fa-list-check"></i> <span data-i18n="open_todo_btn">عرض قائمة To-Do كاملة</span>
+                        </button>
+                        <button id="goToDecomposeBtn" class="btn-primary-sm">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="decompose_new_btn">تفكيك مهمة جديدة</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Motivational Dopamine Quote & Cards Grid -->
+                <div class="motivation-quote-box">
+                    <i class="fa-solid fa-quote-right quote-icon"></i>
+                    <p id="dailyMotivationQuote">«ليس عليك أن تنهي المهمة كلها الآن؛ فقط ابدأ بأصغر خطوة ممكنة لـ 5 دقائق وسيتولى دماغك الباقي.»</p>
+                    <span class="quote-author" data-i18n="quote_source">— مبدأ هارفارد CBT لتجاوز الشلل التنفيذي</span>
+                </div>
+
+                <!-- Hub Quick Action Cards -->
+                <div class="welcome-cards-grid">
+                    <!-- Milestones Card -->
+                    <div class="welcome-card" id="startMilestonesCardBtn">
+                        <div class="card-icon milestone-icon">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <h3 data-i18n="card_m_title">تفكيك المهام والملفات (Milestones)</h3>
+                        <p data-i18n="card_m_desc">اكتب مهمتك أو ارفع ملف مشروعك وسيقوم النظام بتفكيكها إلى مراحل متوازنة مع نصائح تنفيذية من مراجع RAG وتحويلها لقائمة To-Do.</p>
+                        <div class="card-meta">
+                            <span><i class="fa-solid fa-file-arrow-up"></i> نصوص وملفات PDF</span>
+                            <span class="card-btn-link"><span data-i18n="card_m_btn">تفكيك مهمة</span> <i class="fa-solid fa-arrow-left"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- To-Do List Card -->
+                    <div class="welcome-card" id="startTodoListCardBtn">
+                        <div class="card-icon todo-icon">
+                            <i class="fa-solid fa-list-check"></i>
+                        </div>
+                        <h3 data-i18n="nav_todolist">قائمة المهام اليومية (To-Do List)</h3>
+                        <p data-i18n="card_todo_desc">تابع تقدم خطواتك المجهرية، اكسب نقاط الإنجاز اليومية، وحافظ على تدفق الدوبامين الطبيعي خطوة بخطوة.</p>
+                        <div class="card-meta">
+                            <span id="homeTodoStats">0 مهام متبقية</span>
+                            <span class="card-btn-link"><span data-i18n="open_todo_btn">افتح القائمة</span> <i class="fa-solid fa-arrow-left"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 2: Task Milestones Decomposer & To-Do Converter
+             =================================================================== -->
+        <section id="viewMilestones" class="view-pane">
+            <div class="milestones-container">
+                
+                <div class="section-heading-box">
+                    <div class="hero-badge">
+                        <i class="fa-solid fa-puzzle-piece"></i>
+                        <span data-i18n="m_heading_badge">أداة تفكيك المهام المعرفية (CBT Chunking)</span>
+                    </div>
+                    <h2 data-i18n="m_heading_title">فكك مهمتك الكبيرة إلى مراحل قابلة للإنجاز</h2>
+                    <p data-i18n="m_heading_sub">الدماغ المصاب بـ ADHD يرى المهمة ككتلة ضخمة مستحيلة. تفكيكها إلى 3 مراحل يلغي الشلل التنفيذي فوراً.</p>
+                </div>
+
+                <!-- Input Box (Text OR File Upload) -->
+                <div class="milestones-input-card">
+                    <div class="input-tabs">
+                        <button class="input-tab active" id="tabTextMode" data-i18n="tab_text_mode">
+                            <i class="fa-regular fa-keyboard"></i> كتابة المهمة
+                        </button>
+                        <button class="input-tab" id="tabFileMode" data-i18n="tab_file_mode">
+                            <i class="fa-solid fa-file-arrow-up"></i> رفع ملف (PDF / TXT)
+                        </button>
+                    </div>
+
+                    <!-- Mode 1: Textarea -->
+                    <div id="textInputArea" class="input-pane">
+                        <textarea 
+                            id="milestoneTaskText" 
+                            class="task-textarea" 
+                            placeholder="اكتب المهمة أو المشروع الذي يسبب لك شللاً أو تسويفاً... (مثال: كتابة تقرير البحث، ترتيب الغرفة وتصنيف الأغراض، المذاكرة للامتحان)"
+                            data-i18n-placeholder="task_placeholder"
+                            rows="3"
+                        ></textarea>
+                    </div>
+
+                    <!-- Mode 2: File Upload Dropzone -->
+                    <div id="fileInputArea" class="input-pane hidden">
+                        <div class="file-dropzone" id="fileDropzone">
+                            <i class="fa-solid fa-cloud-arrow-up drop-icon"></i>
+                            <p class="drop-text" data-i18n="drop_text">اسحب وأفلت ملف المشروع هنا أو اضغط للاختيار</p>
+                            <span class="drop-sub" data-i18n="drop_sub">يدعم ملفات PDF و TXT و Markdown (حتى 10MB)</span>
+                            <input type="file" id="milestoneFileInput" accept=".pdf,.txt,.md" class="hidden-file-input">
+                            <div id="selectedFileName" class="selected-file-name hidden"></div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="input-actions-row">
+                        <button id="decomposeTaskBtn" class="btn-primary-lg">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> 
+                            <span data-i18n="decompose_btn">تفكيك المهمة وبناء الخطة</span>
+                            <span class="zen-spinner hidden" id="decomposeSpinner"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Milestones Output Section -->
+                <div id="milestonesResultArea" class="milestones-result-area hidden">
+                    <div class="milestone-summary-banner">
+                        <div class="summary-left">
+                            <i class="fa-solid fa-circle-check banner-icon"></i>
+                            <div>
+                                <h3 id="milestoneTaskSummaryTitle">خطة المهمة المفككة</h3>
+                                <p id="milestoneAdviceSummaryText"></p>
+                            </div>
+                        </div>
+                        <div class="time-est-badge" id="milestoneTotalTime">55 دقيقة</div>
+                    </div>
+
+                    <!-- Milestones Cards List -->
+                    <div class="milestones-grid" id="milestonesGrid"></div>
+
+                    <!-- Approval & To-Do Conversion Bar -->
+                    <div class="approval-action-bar">
+                        <button id="approveMilestonesBtn" class="btn-approve-lg">
+                            <i class="fa-solid fa-list-check"></i> <span data-i18n="approve_btn">موافق على الخطة (تحويل إلى قائمة To-Do)</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 3: Dedicated Interactive To-Do List View
+             =================================================================== -->
+        <section id="viewTodoList" class="view-pane">
+            <div class="todolist-container">
+                <div class="todo-card full-page-todo">
+                    <div class="todo-header">
+                        <div>
+                            <h2 data-i18n="todo_title">قائمة المهام التفاعلية (To-Do List)</h2>
+                            <p data-i18n="todo_sub">كل خطوة تنجزها تمنحك <strong>+10 نقاط إنجاز</strong> لإفراز الدوبامين الطبيعي.</p>
+                        </div>
+                        <div class="todo-progress-box">
+                            <span id="todoProgressText">0% منجز</span>
+                            <div class="todo-progress-bar">
+                                <div id="todoProgressBarFill" class="todo-progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Add Single Task -->
+                    <form id="quickAddTodoForm" class="quick-add-todo">
+                        <input type="text" id="quickTodoInput" placeholder="أضف خطوة سريعة لقائمتك واضغط Enter..." required>
+                        <button type="submit" class="btn-add-todo"><i class="fa-solid fa-plus"></i> إضافة</button>
+                    </form>
+
+                    <!-- Checklist Items -->
+                    <div class="todo-items-list" id="todoItemsList">
+                        <div class="empty-todo-state">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                            <p>لا توجد مهام مسجلة حالياً. يمكنك تفكيك مهمة جديدة لتحويلها إلى خطوات فورية!</p>
+                            <button id="goToDecomposeFromTodoBtn" class="btn-secondary-sm">
+                                <i class="fa-solid fa-layer-group"></i> تفكيك مهمة الآن
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 4: ADHD Assessment Games (الألعاب الثلاث بالترتيب)
+             =================================================================== -->
+        <section id="viewAssessment" class="view-pane">
+            <div class="assessment-container">
+                
+                <!-- Game Stage Stepper -->
+                <div class="game-stepper">
+                    <div class="step-node active" id="stepNode1">
+                        <span class="step-num">1</span>
+                        <span class="step-text" data-i18n="step_1_title">الذاكرة العاملة</span>
+                    </div>
+                    <div class="step-line" id="stepLine1"></div>
+                    <div class="step-node" id="stepNode2">
+                        <span class="step-num">2</span>
+                        <span class="step-text" data-i18n="step_2_title">اختبار الانتباه (X)</span>
+                    </div>
+                    <div class="step-line" id="stepLine2"></div>
+                    <div class="step-node" id="stepNode3">
+                        <span class="step-num">3</span>
+                        <span class="step-text" data-i18n="step_3_title">استرجاع الرقم</span>
+                    </div>
+                    <div class="step-line" id="stepLine3"></div>
+                    <div class="step-node" id="stepNode4">
+                        <span class="step-num"><i class="fa-solid fa-flag-checkered"></i></span>
+                        <span class="step-text" data-i18n="step_4_title">التقرير والنتيجة</span>
+                    </div>
+                </div>
+
+                <!-- GAME STAGE 0: Intro Screen -->
+                <div id="gameIntroScreen" class="game-card">
+                    <div class="game-badge">
+                        <i class="fa-solid fa-notes-medical"></i>
+                        <span>ADHD Assessment (Ages 15-25)</span>
+                    </div>
+                    <h2 data-i18n="game_intro_title">اختبار تحديد نمط تشتت الانتباه وفرط الحركة</h2>
+                    <p class="game-desc" data-i18n="game_intro_desc">
+                        ستخوض 3 ألعاب بسيطة ومتتالية تقيس: (1) الذاكرة العاملة الأولية، (2) الانتباه المستمر والتحكم في الاندفاع، (3) الذاكرة العاملة تحت تأثير المشتتات.
+                    </p>
+                    <div class="game-rules-list">
+                        <div class="rule-item">
+                            <span class="rule-icon">1️⃣</span>
+                            <div>
+                                <strong data-i18n="rule1_head">لعبة 1: حفظ رقم سري</strong>
+                                <p data-i18n="rule1_sub">سيظهر رقم مكون من 7 خانات لمدة 10 ثوانٍ؛ احفظه جيداً في ذاكرتك دون كتابته.</p>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">2️⃣</span>
+                            <div>
+                                <strong data-i18n="rule2_head">لعبة 2: اختبار الانتباه السريع (CPT)</strong>
+                                <p data-i18n="rule2_sub">ستتوالى الحروف على الشاشة؛ اضغط (المسافة SPACE) فور ظهور الحرف 'X' فقط!</p>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">3️⃣</span>
+                            <div>
+                                <strong data-i18n="rule3_head">لعبة 3: استرجاع الرقم</strong>
+                                <p data-i18n="rule3_sub">سنطلب منك كتابة الرقم السري الذي حفظته في اللعبة الأولى لقياس ثبات الذاكرة.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="startGameBtn" class="btn-primary-lg">
+                        <i class="fa-solid fa-play"></i> <span data-i18n="start_game_btn">ابدأ الاختبار الآن (جاهز)</span>
+                    </button>
+                </div>
+
+                <!-- GAME 1: Number Memory Test Screen -->
+                <div id="game1Screen" class="game-card hidden">
+                    <div class="game-badge">
+                        <i class="fa-solid fa-brain"></i>
+                        <span>Game 1: Number Memory Test</span>
+                    </div>
+                    <h2 data-i18n="g1_title">احفظ الرقم التالي في ذاكرتك</h2>
+                    <p class="game-desc" data-i18n="g1_desc">ركّز على الرقم جيداً؛ سيختفي بعد 10 ثوانٍ وسنطلب منك استرجاعه بعد اللعبة القادمة.</p>
+
+                    <div class="number-display-box">
+                        <div id="game1NumberDisplay" class="digits-row">4 - 8 - 2 - 9 - 5 - 1 - 7</div>
+                    </div>
+
+                    <div class="countdown-bar-wrap">
+                        <div id="game1Progress" class="countdown-bar-fill"></div>
+                    </div>
+                    <div class="countdown-seconds"><span id="game1TimerText">10</span> <span data-i18n="seconds_label">ثوانٍ متبقية</span></div>
+                </div>
+
+                <!-- GAME 2: Simple Attention Test (CPT) Screen -->
+                <div id="game2Screen" class="game-card hidden">
+                    <div class="game-badge">
+                        <i class="fa-solid fa-crosshairs"></i>
+                        <span>Game 2: Sustained Attention & Impulse Test</span>
+                    </div>
+                    <h2 data-i18n="g2_title">اضغط على زر (المسافة SPACE) عند رؤية الحرف 'X' فقط!</h2>
+                    <p class="game-desc" data-i18n="g2_desc">لا تضغط على أي حرف آخر. حاول أن تكون سريعاً ودقيقاً في نفس الوقت (20 محاولة).</p>
+
+                    <div class="letter-arena">
+                        <div id="game2LetterDisplay" class="active-letter">?</div>
+                    </div>
+
+                    <div class="game2-controls">
+                        <button id="game2SpaceBtn" class="btn-space-trigger">
+                            <i class="fa-solid fa-keyboard"></i> <span data-i18n="space_btn_text">اضغط هنا أو اضغط SPACE</span>
+                        </button>
+                    </div>
+
+                    <div class="game2-progress-row">
+                        <span><span data-i18n="trial_label">المحاولة:</span> <strong id="game2TrialCount">0</strong>/20</span>
+                        <span><span data-i18n="hits_label">إصابات:</span> <strong id="game2HitsCount" class="text-green">0</strong></span>
+                        <span><span data-i18n="misses_label">تشتت:</span> <strong id="game2MissesCount" class="text-orange">0</strong></span>
+                        <span><span data-i18n="false_label">اندفاع:</span> <strong id="game2FalseCount" class="text-red">0</strong></span>
+                    </div>
+                </div>
+
+                <!-- GAME 3: Number Recall Screen -->
+                <div id="game3Screen" class="game-card hidden">
+                    <div class="game-badge">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Game 3: Number Recall Under Distraction</span>
+                    </div>
+                    <h2 data-i18n="g3_title">ما هو الرقم المكون من 7 خانات الذي رأيته في البداية؟</h2>
+                    <p class="game-desc" data-i18n="g3_desc">اكتب الأرقام بنفس الترتيب الذي حفظته قبل لعبة الحروف.</p>
+
+                    <form id="game3RecallForm" class="recall-form">
+                        <div class="recall-inputs-row" id="recallInputsRow">
+                            <input type="text" maxlength="1" class="digit-input" autofocus required>
+                            <input type="text" maxlength="1" class="digit-input" required>
+                            <input type="text" maxlength="1" class="digit-input" required>
+                            <input type="text" maxlength="1" class="digit-input" required>
+                            <input type="text" maxlength="1" class="digit-input" required>
+                            <input type="text" maxlength="1" class="digit-input" required>
+                            <input type="text" maxlength="1" class="digit-input" required>
+                        </div>
+
+                        <button type="submit" id="submitRecallBtn" class="btn-primary-lg">
+                            <i class="fa-solid fa-calculator"></i> <span data-i18n="calc_results_btn">تحليل النتائج وعرض التقرير</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- ASSESSMENT RESULTS SCREEN -->
+                <div id="assessmentResultScreen" class="game-card hidden">
+                    <div class="game-badge success-badge">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                        <span>ADHD Assessment Report</span>
+                    </div>
+
+                    <div class="result-hero-box">
+                        <div class="result-type-pill" id="resultTypeBadge">Combined Presentation (ADHD-C)</div>
+                        <h2 id="resultTypeHeading">نمط تشتت الانتباه والاندفاعية المشترك</h2>
+                        <p id="resultTypeDescription" class="result-summary-text"></p>
+                        
+                        <div class="confidence-tag">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span><span data-i18n="confidence_label">مستوى الثقة في التقييم:</span> <strong id="resultConfidenceLevel">مرتفع (High)</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Scores Breakdown Grid -->
+                    <div class="scores-summary-grid">
+                        <div class="score-card-item">
+                            <div class="score-card-head">
+                                <span data-i18n="score_g1_head">الذاكرة العاملة الأولية</span>
+                                <strong id="resG1Score">3/3</strong>
+                            </div>
+                            <p id="resG1Interp" class="score-card-note"></p>
+                        </div>
+
+                        <div class="score-card-item">
+                            <div class="score-card-head">
+                                <span data-i18n="score_g2_om_head">الانتباه المستمر (Misses)</span>
+                                <strong id="resG2OmScore">3/3</strong>
+                            </div>
+                            <p id="resG2OmInterp" class="score-card-note"></p>
+                        </div>
+
+                        <div class="score-card-item">
+                            <div class="score-card-head">
+                                <span data-i18n="score_g2_com_head">التحكم في الاندفاع (Commissions)</span>
+                                <strong id="resG2ComScore">3/3</strong>
+                            </div>
+                            <p id="resG2ComInterp" class="score-card-note"></p>
+                        </div>
+
+                        <div class="score-card-item">
+                            <div class="score-card-head">
+                                <span data-i18n="score_g3_head">الذاكرة بعد التشتيت</span>
+                                <strong id="resG3Score">3/3</strong>
+                            </div>
+                            <p id="resG3Interp" class="score-card-note"></p>
+                        </div>
+                    </div>
+
+                    <!-- Recommendation & Action -->
+                    <div class="recommendation-box">
+                        <div class="rec-head">
+                            <i class="fa-solid fa-hand-holding-medical"></i>
+                            <h4 data-i18n="rec_title">التوصيات والخطوات المقترحة:</h4>
+                        </div>
+                        <p id="resultRecommendationText" class="rec-body"></p>
+                        
+                        <div class="rec-actions">
+                            <button id="goHomeAfterAssessmentBtn" class="btn-primary-lg">
+                                <i class="fa-solid fa-house"></i> <span data-i18n="go_home_btn">الذهاب للرئيسية ومتابعة المهام</span>
+                            </button>
+                            <button id="openChatbotForAssessmentBtn" class="btn-secondary-outline">
+                                <i class="fa-solid fa-comments"></i> <span data-i18n="consult_ai_btn">استشارة الشات بوت لخطة علاجية</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="clinical-disclaimer">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <p data-i18n="disclaimer_text">
+                            <strong>ملاحظة هامة:</strong> هذا الاختبار هو أداة فحص وتدريب أولية (Screening Tool) مبنية على أبحاث Digit Span و CPT للأعمار (15-25 سنة)، ولا يُعد تشخيصاً طبياً نهائياً. يُرجى مراجعة طبيب أو أخصائي نفسي معتمد للتشخيص الإكلينيكي الكامل.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =======================================================================
+         FLOATING ADHD ADVISOR CHATBOT (Icon & Drawer Window)
+         ======================================================================= -->
+    <div class="chatbot-wrapper">
+        <button id="chatbotFloatingBtn" class="chatbot-fab" title="افتح مستشار ADHD الذكي" aria-label="مستشار ADHD">
+            <span class="fab-pulse"></span>
+            <i class="fa-solid fa-brain fab-icon"></i>
+            <span class="fab-badge" data-i18n="fab_badge">المستشار</span>
+        </button>
+
+        <div id="chatbotDrawer" class="chatbot-drawer hidden">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <div class="chat-avatar">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <div>
+                        <h4 data-i18n="chat_title">مستشار ADHD الذكي</h4>
+                        <span class="chat-status"><span class="status-dot"></span> <span data-i18n="chat_status_online">متصل - متخصص في تشتت الانتباه</span></span>
+                    </div>
+                </div>
+                <button id="closeChatBtn" class="chat-close-btn" aria-label="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div id="chatMessages" class="chat-messages">
+                <div class="chat-bubble bot-bubble">
+                    <div class="bubble-header"><i class="fa-solid fa-brain"></i> <span data-i18n="chat_name">المستشار</span></div>
+                    <p data-i18n="chat_welcome_msg">مرحباً بك! أنا مستشارك المعتمد لـ ADHD. كيف يمكنني مساعدتك اليوم في التغلب على الشلل التنفيذي، إدارة التشتت، أو تنظيم وقتك؟</p>
+                </div>
+            </div>
+
+            <div class="chat-quick-pills">
+                <button class="chat-pill" data-query="عندي شلل تنفيذي وصعوبة في بدء المهمة، ماذا أفعل؟">شلل البدء</button>
+                <button class="chat-pill" data-query="كيف أتعامل مع التشتت وتأخير الأفكار المقاطعة؟">إدارة التشتت</button>
+                <button class="chat-pill" data-query="كيف أنظم قائمة مهام اليوم بدون فوضى؟">تنظيم اليوم</button>
+                <button class="chat-pill" data-query="كيف أتغلب على التسويف والمماطلة؟">علاج التسويف</button>
+            </div>
+
+            <form id="chatForm" class="chat-input-bar">
+                <input 
+                    type="text" 
+                    id="chatInput" 
+                    placeholder="اكتب استشارتك لمرض الـ ADHD..." 
+                    data-i18n-placeholder="chat_input_placeholder"
+                    autocomplete="off"
+                    required
+                >
+                <button type="submit" id="chatSendBtn" class="chat-send-btn" aria-label="إرسال">
+                    <i class="fa-solid fa-paper-plane send-icon"></i>
+                    <span class="chat-spinner hidden" id="chatSpinner"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden Audio for Timer & Game Sounds -->
+    <audio id="timerChime" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="gameCorrectBeep" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- App JavaScript -->
+    <script src="/static/js/app.js?v=6"></script>
+</body>
+</html>
